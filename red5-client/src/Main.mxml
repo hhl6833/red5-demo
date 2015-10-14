@@ -2,6 +2,53 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark">
     <fx:Script><![CDATA[
         import mx.controls.Alert;
+
+        public var rtmpURL:String = "rtmp://localhost/red5-server";
+        public var conn:NetConnection = new NetConnection();
+        public var isConnectSuccess:Boolean = false;
+        public var responder:Responder = new Responder(resultFun);
+
+        NetConnection.prototype.onBWCheck = function ():void {
+        };
+        NetConnection.prototype.onBWDone = function ():void {
+        };
+
+        public function resultFun(object:String):void {
+            trace(object);
+            result.text = object.toString();
+        }
+
+        public function clickConnect(e:MouseEvent):void {
+            conn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
+            conn.connect(rtmpURL, "1935");
+        }
+
+        public function click(e:MouseEvent):void {
+            invoke();
+        }
+
+        public function invoke():void {
+            if (isConnectSuccess) {
+                conn.call("change", responder, str.text);
+            } else {
+                Alert.show("还没有连接到服务器");
+            }
+        }
+
+        public function netStatus(e:NetStatusEvent):void {
+            switch (e.info.code) {
+                case "NetConnection.Connect.Success":
+                    Alert.show("连接成功");
+                    isConnectSuccess = true;
+                    break;
+                case "NetConnection.Call.Failed":
+                    Alert.show("连接失败");
+                    break;
+            }
+        }
         ]]></fx:Script>
-    <s:Button click="Alert.show('Hello, world')" label="Say Hello"/>
+    <s:Button x="224" y="175" label="调用服务器方法" click="this.click(event)"/>
+    <s:TextInput x="129" y="145" id="str" width="212"/>
+    <s:Label x="129" y="119" text="显示从服务器端返回的字符" id="result" width="160" fontSize="12"/>
+    <s:Button x="129" y="175" label="连接服务器" click="this.clickConnect(event)"/>
 </s:Application>
