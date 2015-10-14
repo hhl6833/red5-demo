@@ -3,11 +3,12 @@
                xmlns:mx="library://ns.adobe.com/flex/mx"
                xmlns:s="library://ns.adobe.com/flex/spark">
     <fx:Script><![CDATA[
+        import mx.core.UIComponent;
+
         import spark.components.Alert;
 
-        private var rtmpURL:String = "rtmp://localhost/oflaDemo";
-        private var conn:NetConnection = new NetConnection();
-        private var isConnectSuccess:Boolean = false;
+        private var rtmpURL:String = "rtmp://localhost/red5-server";
+        private var conn:NetConnection;
         private var netStream:NetStream;
         private var video:Video = new Video();
 
@@ -17,28 +18,32 @@
         };
 
         private function clickConnect(e:MouseEvent):void {
-            if (!isConnectSuccess) {
-                conn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
-                conn.connect(rtmpURL);
-            }
+            conn = new NetConnection();
+            conn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
+            conn.connect(rtmpURL);
         }
 
         private function netStatus(e:NetStatusEvent):void {
-            trace(e.info.code);
-            if (e.info.code == "NetConnection.Connect.Success") {
-                isConnectSuccess = true;
-                ui.addChild(video);
-                video.width = 500;
-                video.height = 500;
-                netStream = new NetStream(conn);
-                netStream.play(rtmpURL + "/ok.fly");
-                video.attachNetStream(netStream);
+            switch (e.info.code) {
+                case "NetConnection.Connect.Success":
+                    connectStream();
+                    break;
+                case "NetStream.Play.StreamNotFound":
+                    trace("Stream not found");
+                    break;
             }
         }
+
+        private function connectStream():void {
+            var ui:UIComponent = new UIComponent();
+            ui.addChild(video);
+            addElement(ui);
+            var stream:NetStream = new NetStream(conn);
+            stream.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
+            stream.client = new StreamClient();
+            video.attachNetStream(stream);
+            stream.play("ok.flv");
+        }
         ]]></fx:Script>
-    <s:layout>
-        <s:VerticalLayout/>
-    </s:layout>
-    <mx:UIComponent id="ui" width="500" height="500"/>
-    <s:Button x="378" y="369" label="Button" click="this.clickConnect(event)"/>
+    <s:Button label="Button" click="this.clickConnect(event)"/>
 </s:Application>
