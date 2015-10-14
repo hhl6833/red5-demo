@@ -7,6 +7,7 @@
         public var conn:NetConnection = new NetConnection();
         public var isConnectSuccess:Boolean = false;
         public var responder:Responder = new Responder(resultFun);
+        public var client1:Object = new Object();
 
         NetConnection.prototype.onBWCheck = function ():void {
         };
@@ -14,11 +15,13 @@
         };
 
         public function resultFun(object:String):void {
-            trace(object);
+            Alert.show(object);
             result.text = object.toString();
         }
 
         public function clickConnect(e:MouseEvent):void {
+            client1.clientMethod = this.clientMethod;
+            conn.client = this.client1;
             conn.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             conn.connect(rtmpURL, "1935");
         }
@@ -33,6 +36,10 @@
             } else {
                 Alert.show("还没有连接到服务器");
             }
+        }
+
+        public function clientMethod(str:String, num:Number):void {
+            Alert.show("接收" + str + (num + 1));
         }
 
         public function netStatus(e:NetStatusEvent):void {
