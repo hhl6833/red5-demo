@@ -5,11 +5,11 @@
     <fx:Script><![CDATA[
         import spark.components.Alert;
 
-        private var rtmpURL:String = "rtmp://localhost/red5-server";
+        private var rtmpURL:String = "rtmp://localhost/oflaDemo";
         private var conn:NetConnection = new NetConnection();
         private var isConnectSuccess:Boolean = false;
-        private var so:SharedObject;
-        private var isDown:Boolean = false;
+        private var netStream:NetStream;
+        private var video:Video = new Video();
 
         NetConnection.prototype.onBWCheck = function ():void {
         };
@@ -23,41 +23,22 @@
             }
         }
 
-        private function mouseDown(e:MouseEvent):void {
-            rect.startDrag();
-            isDown = true;
-        }
-
-        private function mouseUp(e:MouseEvent):void {
-            rect.stopDrag();
-            isDown = false;
-        }
-
-        private function mouseMove(e:MouseEvent):void {
-            if (isDown) {
-                so.setProperty("x", rect.x);
-                so.setProperty("y", rect.y);
-            }
-        }
-
         private function netStatus(e:NetStatusEvent):void {
             trace(e.info.code);
             if (e.info.code == "NetConnection.Connect.Success") {
                 isConnectSuccess = true;
+                ui.addChild(video);
+                video.width = 500;
+                video.height = 500;
+                netStream = new NetStream(conn);
+                netStream.play(rtmpURL + "/ok.fly");
+                video.attachNetStream(netStream);
             }
-            so = SharedObject.getRemote("point", conn.uri, true);
-            so.connect(conn);
-            so.addEventListener(SyncEvent.SYNC, syncro);
-        }
-
-        public function syncro(e:SyncEvent):void {
-            rect.x = so.data.x;
-            rect.y = so.data.y;
         }
         ]]></fx:Script>
-    <mx:Canvas x="279" y="99" width="105" height="73" id="rect" backgroundColor="#da4040"
-               mouseDown="this.mouseDown(event)"
-               mouseUp="this.mouseUp(event)"
-               mouseMove="this.mouseMove(event)"/>
-    <s:Button x="10" y="10" label="Button" click="clickConnect(event)"/>
+    <s:layout>
+        <s:VerticalLayout/>
+    </s:layout>
+    <mx:UIComponent id="ui" width="500" height="500"/>
+    <s:Button x="378" y="369" label="Button" click="this.clickConnect(event)"/>
 </s:Application>
