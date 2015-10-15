@@ -36,13 +36,17 @@
 
         private function connectStream():void {
             var ui:UIComponent = new UIComponent();
+            ui.width = 500;
+            ui.height = 500;
+            video.width = 500;
+            video.height = 500;
             ui.addChild(video);
             addElement(ui);
             var stream:NetStream = new NetStream(conn);
             stream.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             stream.client = new StreamClient();
             video.attachNetStream(stream);
-            stream.play("ok.flv");
+            stream.play("a.flv");
         }
         ]]></fx:Script>
     <s:Button label="Button" click="this.clickConnect(event)"/>
