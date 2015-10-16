@@ -46,7 +46,8 @@
             stream.addEventListener(NetStatusEvent.NET_STATUS, netStatus);
             stream.client = new StreamClient();
             video.attachNetStream(stream);
-            stream.play("a.flv");
+            Alert.show("连接成功,开始播放视频!");
+            stream.play("a.mp4");
         }
         ]]></fx:Script>
     <s:Button label="Button" click="this.clickConnect(event)"/>

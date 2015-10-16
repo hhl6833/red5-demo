@@ -22,7 +22,7 @@
 
     <bean id="web.handler" class="com.hn6833.Application"/>
     <bean id="streamFilenameGenerator" class="com.hn6833.CustomFilenameGenerator">
-        <property name="recordPath" value="recordedStreams/"/>
-        <property name="playbackPath" value="videoStreams/"/>
+        <property name="path" value="vstreams/"/>
+        <property name="absolutePath" value="false"/>
     </bean>
 </beans>
